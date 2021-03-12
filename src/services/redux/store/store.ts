@@ -1,11 +1,10 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import ReduxThunk from 'redux-thunk';
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import ReduxThunk from "redux-thunk";
 
-import { authReducer, moviesReducer } from '../reducers';
+import { authReducer } from "../reducers";
 
 const mainReducer = combineReducers({
-    auth: authReducer,
-    movies: moviesReducer,
+  auth: authReducer,
 });
 
 export const store = createStore(mainReducer, applyMiddleware(ReduxThunk));
