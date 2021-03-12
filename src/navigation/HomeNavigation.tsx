@@ -1,55 +1,36 @@
-import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react";
 
-import { theme } from '../constants';
-import HomeScreen from '../screens/Home/Home';
-import { AddMovieScreen } from '../screens/AddMovie';
+import HomeScreen from "../screens/Home/Home";
+import SearchScreen from "../screens/Search/Search";
+import DetailsScreen from "../screens/Details/Details";
 
 const HomeFlow = createStackNavigator();
 
 const HomeNavigation = () => (
-    <HomeFlow.Navigator initialRouteName="Home">
-        <HomeFlow.Screen
-            name="Home"
-            component={HomeScreen}
-            options={({ navigation }) => {
-                return {
-                    headerTitle: 'Home',
-                    headerStyle: {
-                        backgroundColor: theme.colors.backdrop,
-                    },
-                    headerTitleStyle: {
-                        fontWeight: 'bold',
-                    },
-                    headerRight: () => (
-                        <MaterialCommunityIcons
-                            name="plus"
-                            color={theme.colors.primary}
-                            size={26}
-                            style={{ marginHorizontal: 10 }}
-                            onPress={() => navigation.navigate('AddMovie')}
-                        />
-                    ),
-                };
-            }}
-        />
-        <HomeFlow.Screen
-            name="AddMovie"
-            component={AddMovieScreen}
-            options={({ navigation }) => {
-                return {
-                    headerTitle: 'Add Movie',
-                    headerStyle: {
-                        backgroundColor: theme.colors.backdrop,
-                    },
-                    headerTitleStyle: {
-                        fontWeight: 'bold',
-                    },
-                };
-            }}
-        />
-    </HomeFlow.Navigator>
+  <HomeFlow.Navigator initialRouteName="Home">
+    <HomeFlow.Screen
+      name="Home"
+      component={HomeScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <HomeFlow.Screen
+      name="Search"
+      component={SearchScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+    <HomeFlow.Screen
+      name="Details"
+      component={DetailsScreen}
+      options={{
+        headerShown: false,
+      }}
+    />
+  </HomeFlow.Navigator>
 );
 
 export default HomeNavigation;
