@@ -1,13 +1,13 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from "react-native";
+import { theme } from "../../constants";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: theme.colors.white,
+    justifyContent: "center",
+    alignItems: "center",
   },
   img: {
-    width: 150,
     height: 150,
   },
 });
