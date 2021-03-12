@@ -1,8 +1,6 @@
-import { _retrieveData } from "./helpers";
 import { I18nManager } from "react-native";
 
 const publicKey = "7e530670d870cc1cd95c07b32e367299";
-const hashedApiKey = "14043482e5bcab6b08bf7c93c62e6f13";
 let privateKey = "a1fec537abfd6748c8df28f87544b3b0f6fdfb8d";
 const baseURL = `https://gateway.marvel.com/v1/public/`;
 var md5 = require("md5");
@@ -77,15 +75,8 @@ class BaseController {
     try {
       let response = await fetch(url, options);
       let responseJson = await response.json();
-      // console.log(
-      //   `[${method}] URL => ${url}`,
-      //   `${"\n"}Body => ${JSON.stringify(body, null, 4)}`,
-      //   `${"\n"}response => `,
-      //   JSON.stringify(responseJson, null, 4)
-      // );
       return responseJson;
     } catch (error) {
-      // console.log("error => ", JSON.stringify(error, null, 4));
       return error;
     }
   }
@@ -100,9 +91,6 @@ class BaseController {
     if (response.code != 200) {
       message += response.reason;
     }
-    // if (response.errors) {
-    //   response.errors.map((msg: string) => (message += msg + "\n"));
-    // }
     return message;
   }
 }

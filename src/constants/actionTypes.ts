@@ -1,7 +1,3 @@
 //AUTH ACTIONS
-export const SAVE_TOKEN = 'SAVE_TOKEN';
-export const SAVE_SESSION = 'SAVE_SESSION';
-
-//MOVIES ACTIONS
-export const ADD_MOVIE = 'ADD_MOVIE';
-export const FETCH_MOVIES = 'FETCH_MOVIES';
+export const SAVE_TOKEN = "SAVE_TOKEN";
+export const SAVE_SESSION = "SAVE_SESSION";
