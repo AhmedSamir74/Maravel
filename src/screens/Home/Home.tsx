@@ -10,7 +10,6 @@ import { styles } from "./style";
 import { showToast } from "../../services/utils/helpers";
 import CharacterController from "../../services/utils/CharacterController";
 import { theme } from "../../constants";
-import { connect } from "react-redux";
 import { ICharacter, IState } from "../../models";
 import { CharacterCard } from "../../components";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -122,8 +121,4 @@ class HomeScreen extends Component<any> {
   }
 }
 
-const mapStateToProps = (state: any) => ({
-  myMovies: state.movies.data,
-});
-
-export default connect(mapStateToProps)(HomeScreen);
+export default HomeScreen;

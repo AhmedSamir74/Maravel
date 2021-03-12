@@ -7,12 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
+  SafeAreaView,
 } from "react-native";
 import { styles } from "./style";
 import { showToast } from "../../services/utils/helpers";
 import CharacterController from "../../services/utils/CharacterController";
 import { theme } from "../../constants";
-import { connect } from "react-redux";
 import { ICharacter, IState } from "../../models";
 import { CharacterCard } from "../../components";
 import { throttle } from "lodash";
@@ -90,86 +90,84 @@ class SearchScreen extends Component<any> {
 
   render() {
     return (
-      <View style={styles.layout}>
-        <StatusBar
-          barStyle="light-content"
-          backgroundColor={theme.colors.background}
-        />
-
-        <View style={styles.listCont}>
-          <View style={styles.searchCont}>
-            <View style={styles.headerCont}>
-              <MaterialCommunityIcons
-                name="magnify"
-                color={theme.colors.white}
-                size={25}
-              />
-              <TextInput
-                placeholder={strings("search")}
-                placeholderTextColor={theme.colors.white}
-                onChangeText={this.handleInput.bind(this)}
-                style={styles.searchInput}
-                value={this.state.searchText}
-                onFocus={() => {
-                  this.handleOpacity(true);
-                }}
-                onBlur={() => {
-                  this.handleOpacity(false);
-                }}
-              />
-              <Animated.View style={{ opacity: this.state.clearBtnOpacity }}>
-                <MaterialCommunityIcons
-                  name="close"
-                  color={theme.colors.white}
-                  size={20}
-                  onPress={() => this.handleInput("")}
-                />
-              </Animated.View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.cancelTextCont}
-              onPress={() => this.props.navigation.goBack()}
-            >
-              <Text style={styles.cancelText}>{strings("cancel")}</Text>
-            </TouchableOpacity>
-          </View>
-          {this.state.requestLoading && (
-            <View style={styles.activityIndicatorCont}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-            </View>
-          )}
-          <FlatList
-            refreshing={this.state.refreshing}
-            onRefresh={() => this.getCharacters()}
-            data={this.state.characters}
-            renderItem={({ item }: { item: ICharacter }) => (
-              <CharacterCard
-                item={item}
-                searchCard
-                searchWords={this.state.searchText}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-            onEndReached={() => {
-              this.state.characters.length > this.state.limit &&
-                this.getCharacters(this.state.offset + this.state.limit);
-            }}
-            onEndReachedThreshold={0.01}
-            keyExtractor={(item) => `${item.id}`}
-            ListEmptyComponent={() =>
-              !this.state.requestLoading ? <EmptyList /> : null
-            }
-            contentContainerStyle={styles.listCont}
+      <SafeAreaView style={styles.layout}>
+        <View style={styles.layout}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor={theme.colors.background}
           />
+
+          <View style={styles.listCont}>
+            <View style={styles.searchCont}>
+              <View style={styles.headerCont}>
+                <MaterialCommunityIcons
+                  name="magnify"
+                  color={theme.colors.white}
+                  size={25}
+                />
+                <TextInput
+                  placeholder={strings("search")}
+                  placeholderTextColor={theme.colors.white}
+                  onChangeText={this.handleInput.bind(this)}
+                  style={styles.searchInput}
+                  value={this.state.searchText}
+                  onFocus={() => {
+                    this.handleOpacity(true);
+                  }}
+                  onBlur={() => {
+                    this.handleOpacity(false);
+                  }}
+                />
+                <Animated.View style={{ opacity: this.state.clearBtnOpacity }}>
+                  <MaterialCommunityIcons
+                    name="close"
+                    color={theme.colors.white}
+                    size={20}
+                    onPress={() => this.handleInput("")}
+                  />
+                </Animated.View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.cancelTextCont}
+                onPress={() => this.props.navigation.goBack()}
+              >
+                <Text style={styles.cancelText}>{strings("cancel")}</Text>
+              </TouchableOpacity>
+            </View>
+            {this.state.requestLoading && (
+              <View style={styles.activityIndicatorCont}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+              </View>
+            )}
+            <FlatList
+              refreshing={this.state.refreshing}
+              onRefresh={() => this.getCharacters()}
+              data={this.state.characters}
+              renderItem={({ item }: { item: ICharacter }) => (
+                <CharacterCard
+                  item={item}
+                  searchCard
+                  searchWords={this.state.searchText}
+                />
+              )}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => {
+                this.state.characters.length > this.state.limit &&
+                  this.getCharacters(this.state.offset + this.state.limit);
+              }}
+              onEndReachedThreshold={0.01}
+              keyExtractor={(item) => `${item.id}`}
+              ListEmptyComponent={() =>
+                !this.state.requestLoading ? <EmptyList /> : null
+              }
+              contentContainerStyle={styles.listCont}
+            />
+          </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }
 
-const mapStateToProps = (state: any) => ({
-  myMovies: state.movies.data,
-});
-
-export default connect(mapStateToProps)(SearchScreen);
+export default SearchScreen;
