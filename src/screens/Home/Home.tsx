@@ -1,206 +1,129 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
-    ActivityIndicator,
-    Dimensions,
-    FlatList,
-    Image,
-    StatusBar,
-    Text,
-    View,
-} from 'react-native';
-import { styles } from './style';
-import { showToast } from '../../services/utils/helpers';
-import MoviesController from '../../services/utils/moviesController';
-import { Card } from '../../components/UI';
-import { theme } from '../../constants';
-import { connect } from 'react-redux';
-import { strings } from '../../localization/i18n';
-import ScrollBottomSheet from 'react-native-scroll-bottom-sheet';
-import { Button } from 'react-native-paper';
-import { IMovie, IMyMovie, IState } from '../../models';
-import { MovieCard } from '../../components';
-
-const windowHeight = Dimensions.get('window').height;
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StatusBar,
+  View,
+} from "react-native";
+import { styles } from "./style";
+import { showToast } from "../../services/utils/helpers";
+import CharacterController from "../../services/utils/CharacterController";
+import { theme } from "../../constants";
+import { connect } from "react-redux";
+import { ICharacter, IState } from "../../models";
+import { CharacterCard } from "../../components";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 class HomeScreen extends Component<any> {
-    moviesController: MoviesController;
-    constructor(props: any) {
-        super(props);
-        this.moviesController = new MoviesController();
-    }
+  characterController: CharacterController;
+  constructor(props: any) {
+    super(props);
+    this.characterController = new CharacterController();
+  }
 
-    state = {
-        movies: [],
-        refreshing: false,
-        requestLoading: true,
-        currentPage: 1,
-        pages: 0,
+  state = {
+    characters: [],
+    refreshing: false,
+    requestLoading: true,
+    limit: 10,
+    offset: 0,
+    total: 0,
+  };
 
-        myMovies: [],
-        myMovies_refreshing: false,
-    };
+  componentDidMount() {
+    this.getCharacters(0);
+  }
 
-    componentDidMount() {
-        this.getMovies(1);
-        this.getMyMovies(true);
-    }
-
-    async getMovies(pageNum: number, isRefresh?: boolean) {
-        if (pageNum != 1 || isRefresh) {
-            this.setState({ refreshing: true });
-        }
-        const { status, data, page, pages } = await this.moviesController.getMovies(pageNum);
-        if (status) {
-            this.setState((prevState: IState, props) => ({
-                movies: isRefresh ? data : [...prevState.movies, ...data],
-                requestLoading: false,
-                refreshing: false,
-                currentPage: page,
-                pages,
-            }));
-        } else {
-            showToast(data);
-        }
-    }
-
-    componentDidUpdate(prevProps: any) {
-        if (this.props.myMovies !== prevProps.myMovies) {
-            this.getMyMovies();
-        }
-    }
-
-    getMyMovies(firstTime?: boolean) {
-        // Pagination done by slicing the movies in redux by 5
-        this.setState({ myMovies_refreshing: true });
-        this.setState({ myMovies: this.props.myMovies });
-
+  async getCharacters(offset: number, reload?: boolean) {
+    if (this.state.total > this.state.characters.length || !offset) {
+      if (offset || reload) {
+        this.setState({ refreshing: true });
+      }
+      const {
+        status,
+        data,
+        newOffset,
+        total,
+      } = await this.characterController.getCharacters(offset);
+      if (status) {
         this.setState((prevState: IState, props) => ({
-            myMovies: firstTime
-                ? this.props.myMovies.slice(0, 5)
-                : [
-                      ...prevState.myMovies,
-                      ...this.props.myMovies.slice(
-                          prevState.myMovies.length,
-                          prevState.myMovies.length + 5
-                      ),
-                  ],
-            myMovies_refreshing: false,
+          characters: reload ? data : [...prevState.characters, ...data],
+          requestLoading: false,
+          refreshing: false,
+          offset: newOffset,
+          total,
         }));
+      } else {
+        showToast(data);
+      }
     }
+  }
 
-    renderMyMovie({ item }: { item: IMyMovie }) {
-        let date = new Date(item.date);
+  render() {
+    return (
+      <View style={styles.layout}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
 
-        return (
-            <Card disabled>
-                <View style={styles.cardCont}>
-                    <Image
-                        source={
-                            item.img
-                                ? {
-                                      uri: item.img,
-                                  }
-                                : require('../../assets/logo.png')
-                        }
-                        style={styles.cardImg}
-                    />
-                    <View style={styles.textCont}>
-                        <View>
-                            <Text style={styles.title}>{item.title}</Text>
-                            <Text style={styles.overview} numberOfLines={3}>
-                                {item.overview}
-                            </Text>
-                        </View>
-                        <Text style={styles.date}>{date.toDateString()}</Text>
-                    </View>
-                </View>
-            </Card>
-        );
-    }
-
-    render() {
-        return (
-            <View style={styles.layout}>
-                <StatusBar barStyle="dark-content" backgroundColor={theme.colors.backdrop} />
-                {this.state.requestLoading && (
-                    <View style={styles.activityIndicatorCont}>
-                        <ActivityIndicator size="large" color={theme.colors.primary} />
-                    </View>
-                )}
-                <View style={styles.myListCont}>
-                    <View style={styles.listCont}>
-                        <Text style={styles.sectionTitle}>{strings('allMovies')}</Text>
-                        <FlatList
-                            refreshing={this.state.refreshing}
-                            onRefresh={() => this.getMovies(1, true)}
-                            data={this.state.movies}
-                            renderItem={({ item }: { item: IMovie }) => <MovieCard item={item} />}
-                            showsVerticalScrollIndicator={false}
-                            onEndReached={() => this.getMovies(this.state.currentPage + 1)}
-                            onEndReachedThreshold={0.3}
-                            ListFooterComponent={() => (
-                                <View style={styles.footerCont}>
-                                    <ActivityIndicator size="small" color={theme.colors.primary} />
-                                </View>
-                            )}
-                            keyExtractor={(item) => `${item.id}`}
-                        />
-                    </View>
-                    <ScrollBottomSheet<string> // If you are using TS, that'll infer the renderItem `item` type
-                        componentType="FlatList"
-                        snapPoints={[128, '80%', windowHeight - 200]}
-                        initialSnapIndex={2}
-                        renderHandle={() => (
-                            <View style={styles.header}>
-                                <View style={styles.panelHandle} />
-                            </View>
-                        )}
-                        data={this.state.myMovies}
-                        keyExtractor={(item, index) => `${index}`}
-                        renderItem={({ item }: { item: IMyMovie }) => <MovieCard myMovie={item} />}
-                        contentContainerStyle={styles.contentContainerStyle}
-                        ListEmptyComponent={
-                            <View style={styles.noDataWarn}>
-                                <Text style={styles.noDataTxt}>{strings('emptyList')}</Text>
-                                <Button
-                                    onPress={() => this.props.navigation.navigate('AddMovie')}
-                                    mode="text"
-                                    dark>
-                                    {strings('addMovie')}
-                                </Button>
-                            </View>
-                        }
-                        style={styles.bottomSheetStyle}
-                        ListFooterComponent={() => (
-                            <View style={styles.footerCont}>
-                                {this.state.myMovies_refreshing ? (
-                                    <ActivityIndicator size="small" color={theme.colors.primary} />
-                                ) : (
-                                    this.state.myMovies.length != 0 && (
-                                        <Button
-                                            onPress={() =>
-                                                this.props.navigation.navigate('AddMovie')
-                                            }
-                                            mode="text"
-                                            dark>
-                                            {strings('addMovie')}
-                                        </Button>
-                                    )
-                                )}
-                            </View>
-                        )}
-                        ListHeaderComponent={
-                            <Text style={styles.sectionTitle}>{strings('myMovies')}</Text>
-                        }
-                    />
-                </View>
+        <View style={styles.listCont}>
+          <View style={styles.headerCont}>
+            <View style={styles.headerLogoCont}>
+              <Image
+                source={require("../../assets/imgs/logo.png")}
+                style={styles.headerLogo}
+                resizeMode="contain"
+              />
             </View>
-        );
-    }
+            <MaterialCommunityIcons
+              name="magnify"
+              color={theme.colors.primary}
+              size={30}
+              onPress={() => this.props.navigation.navigate("Search")}
+            />
+          </View>
+          {this.state.requestLoading && (
+            <View style={styles.activityIndicatorCont}>
+              <ActivityIndicator size="large" color={theme.colors.primary} />
+            </View>
+          )}
+          <View style={styles.listCont}>
+            <FlatList
+              refreshing={this.state.refreshing}
+              onRefresh={() => this.getCharacters(0, true)}
+              data={this.state.characters}
+              renderItem={({ item }: { item: ICharacter }) => (
+                <CharacterCard item={item} />
+              )}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() =>
+                this.getCharacters(this.state.offset + this.state.limit)
+              }
+              onEndReachedThreshold={0.01}
+              ListFooterComponent={() =>
+                this.state.characters.length ? (
+                  <View style={styles.footerCont}>
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.primary}
+                    />
+                  </View>
+                ) : null
+              }
+              keyExtractor={(item) => `${item.id}`}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
 }
 
 const mapStateToProps = (state: any) => ({
-    myMovies: state.movies.data,
+  myMovies: state.movies.data,
 });
 
 export default connect(mapStateToProps)(HomeScreen);
