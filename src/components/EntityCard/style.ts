@@ -31,6 +31,7 @@ export const styles = StyleSheet.create({
   closeIcon: {
     textAlign: "right",
     marginHorizontal: 15,
+    marginTop: 25,
   },
   centeredView: {
     flex: 1,
